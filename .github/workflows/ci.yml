@@ -260,12 +260,6 @@ jobs:
           # Unshallow the repository in order for `PubspecBuilder` and its
           # `git describe` to work.
           fetch-depth: 0
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VER }}
-          channel: stable
-          cache: true
-
       - run: sudo apt-get update -y 
       - run: sudo apt-get install -y
                           ninja-build
@@ -274,6 +268,14 @@ jobs:
                           libpulse-dev
                           libmpv-dev
                           mpv
+                          jq
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VER }}
+          channel: stable
+          cache: true
+
 
       - run: flutter config --enable-linux-desktop
 
