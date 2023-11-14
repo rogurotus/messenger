@@ -271,6 +271,7 @@ jobs:
                           jq
                           curl
                           git
+                          make
 
       - uses: subosito/flutter-action@v2
         with:
