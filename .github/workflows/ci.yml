@@ -121,7 +121,6 @@ jobs:
           - apk
           - appbundle
           - ios
-          - linux
           - macos
           - web
           - windows
