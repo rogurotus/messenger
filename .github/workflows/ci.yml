@@ -272,6 +272,7 @@ jobs:
                           curl
                           git
                           make
+                          procps
 
       - uses: subosito/flutter-action@v2
         with:
