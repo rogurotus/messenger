@@ -270,6 +270,7 @@ jobs:
                           mpv
                           jq
                           curl
+                          git
 
       - uses: subosito/flutter-action@v2
         with:
