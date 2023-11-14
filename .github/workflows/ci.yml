@@ -274,6 +274,7 @@ jobs:
                           make
                           procps
                           cmake
+                          clang
 
       - run: git config --global --add safe.directory '*'
 
