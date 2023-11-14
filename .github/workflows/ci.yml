@@ -273,6 +273,8 @@ jobs:
                           git
                           make
                           procps
+                          
+      - run: git config --global --add safe.directory '*'
 
       - uses: subosito/flutter-action@v2
         with:
