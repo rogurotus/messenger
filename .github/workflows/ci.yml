@@ -250,6 +250,80 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  build-linux:
+    name: build (linux)
+    runs-on: ubuntu-latest
+    # Pin glibc to 2.31 version for better compatibility.
+    container: debian:bullseye
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Unshallow the repository in order for `PubspecBuilder` and its
+          # `git describe` to work.
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VER }}
+          channel: stable
+          cache: true
+
+      - run: sudo apt-get update -y 
+      - run: sudo apt-get install -y
+                          ninja-build
+                          libunwind-dev
+                          libgtk-3-dev
+                          libpulse-dev
+                          libmpv-dev
+                          mpv
+
+      - run: flutter config --enable-linux-desktop
+
+      - name: Parse semver versions from Git tag
+        id: semver
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          text: ${{ github.ref }}
+          regex: '^refs/tags/v(((([0-9]+)\.[0-9]+)\.[0-9]+)(-.+)?)$'
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - run: make flutter.pub
+
+      - run: make flutter.build platform=linux
+
+      - name: Parse application name from Git repository name
+        id: app
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          text: ${{ github.repository }}
+          regex: '^${{ github.repository_owner }}/(.+)$'
+
+      - run: mkdir artifacts/
+
+      - uses: thedoctor0/zip-release@0.7.1
+        with:
+          filename: ${{ github.workspace }}/artifacts/${{ steps.app.outputs.group1 }}-${{ matrix.platform }}.zip
+          directory: 'build/linux/x64/release/bundle'
+          
+      - name: Generate SHA256 checksums
+        run: ${{ (runner.os == 'Windows'
+                  && 'forfiles /M *.zip /C "cmd /c sha256sum @file > @file.sha256sum"')
+              || (runner.os == 'macOS'
+                  && 'ls -1 | xargs -I {} sh -c "shasum -a 256 {} > {}.sha256sum"')
+              ||     'ls -1 | xargs -I {} sh -c "sha256sum {} > {}.sha256sum"' }}
+        working-directory: artifacts/
+      - name: Show generated SHA256 checksums
+        run: ${{ (runner.os == 'Windows'
+                  && 'type *.sha256sum')
+              ||     'cat *.sha256sum' }}
+        working-directory: artifacts/
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ matrix.platform }}-${{ github.run_number }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 1
+
   dartdoc:
     runs-on: ubuntu-latest
     steps:
