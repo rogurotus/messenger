@@ -269,6 +269,7 @@ jobs:
                           libmpv-dev
                           mpv
                           jq
+                          curl
 
       - uses: subosito/flutter-action@v2
         with:
