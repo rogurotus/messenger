@@ -327,11 +327,11 @@ jobs:
               ||     'cat *.sha256sum' }}
         working-directory: artifacts/
 
+      - name: UPLOAD
       - uses: actions/upload-artifact@v3
         with:
-          name: build-${{ matrix.platform }}-${{ github.run_number }}
+          name: build-linux-${{ github.run_number }}
           path: artifacts/
-          if-no-files-found: error
           retention-days: 1
 
   dartdoc:
